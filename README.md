@@ -2,7 +2,7 @@
 
 This is a command line tool for accessing USB HID devices. It assumes that the device will respond to a received packet by immediately sending a response.
 
-### How to use it ###
+## How to use it
 
 Command line arguments provide the VID and PID and the contents of the 64 byte packet sent to the device. The response is 'NULL' is no device is connected, 'ERROR: message' if something went wrong trying to connect to or read from the device, or the 64 byte packet returned from the device. For example, with the AudioMoth device:
 
@@ -13,7 +13,7 @@ Command line arguments provide the VID and PID and the contents of the 64 byte p
 
 From Node.js or Python the command line tool can be called as a child process.
 
-### Linux ###
+## Linux
 
 The executable will work as is on macOS and Windows. However, Linux prevents USB HID devices from being writable by default. This can be fixed by adding an additional rule in /lib/udev/rules.d/. For AudioMoth, the following additional rule file, called 99-audiomoth.rules, is used. The content of which is:
 
@@ -21,9 +21,40 @@ The executable will work as is on macOS and Windows. However, Linux prevents USB
 SUBSYSTEM=="usb", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="0002", MODE="0666"
 ```
 
-### Building ###
+## Building
+
+Building the binary requires a build toolchain, including make, cmake and gcc.
+
+### Cross Compiling - Raspberry PI
+
+On Linux, after creating the prerequisites below, to cross compile for ARM architecture use the `build.sh` command.
+
+```bash
+cd src\arm
+./build.sh
+```
+
+1. Cross Compiling for a Raspberry PI requires a local copy of [raspberry-pi tools](https://github.com/raspberrypi/tools) 
+
+  ```bash
+  cd ~/build
+  git clone https://github.com/raspberrypi/tools.git raspberrypi-tools
+  ```
+
+2. Cross Compiling for a Raspberry PI requires a local copy of [libusb](https://github.com/libusb/libusb) which has been also cross-compiled.
+
+  ```bash
+  cd ~/build
+  git clone https://github.com/libusb/libusb.git
+  cd libusb
+  ./configure CC=~/build/raspberrypi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/arm-linux-gnueabihf-gcc --host=arm-linux --enable-udev=no --enable-shared --prefix=/usr/local/libusb-rpi
+  make
+  ```
+### Mac OS
 
 On macOS use the Xcode project to build the binary. After archiving, the resulting executable must be manually moved to the correct folder.
+
+### Linux
 
 On Linux use gcc to build the binary by running build.sh. This will copy the executable to the correct folder. Or compile manually. 
 
@@ -36,6 +67,8 @@ The libusb development library must be installed.
 ```
 > sudo apt-get install libusb-1.0-0-dev
 ```
+
+### Windows
 
 On Windows use the Microsoft Visual C++ Build Tools on the command line by running running build.bat or build32.bat. This will copy the executable to the correct folder. 
 
